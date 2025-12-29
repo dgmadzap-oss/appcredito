@@ -1,0 +1,41 @@
+name: Crear APK Android
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Chequear código
+      uses: actions/checkout@v3
+
+    - name: Instalar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Instalar Java (Necesario para Android)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Instalar Dependencias
+      run: |
+        pip install -r requirements.txt
+        pip install flet
+
+    - name: Configurar SDK de Android y Compilar
+      # Este comando descarga todo lo necesario y crea la APK
+      run: |
+        flet build apk --verbose
+
+    - name: Subir APK Resultante
+      uses: actions/upload-artifact@v4
+      with:
+        name: AppCredito-APK
+        path: build/apk/*.apk
